@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../core/app_colors.dart';
+import '../screens/forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  
+
   // Error state variables
   String? _usernameError;
   String? _passwordError;
@@ -77,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     children: [
                       SizedBox(height: 20),
-                      
+
                       // White login card
                       Container(
                         decoration: BoxDecoration(
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(height: 5),
-                            
+
                             // Subtitle
                             Text(
                               'أدخل اسم المستخدم أو البريد الإلكتروني وكلمة السر',
@@ -108,15 +109,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(height: 25),
-                            
+
                             // Username TextField
                             Container(
                               decoration: BoxDecoration(
                                 color: Color(0xFFEEEEEE),
                                 borderRadius: BorderRadius.circular(8),
-                                border: _usernameError != null 
-                                    ? Border.all(color: Colors.red, width: 1.0)
-                                    : null,
+                                border:
+                                    _usernameError != null
+                                        ? Border.all(
+                                          color: Colors.red,
+                                          width: 1.0,
+                                        )
+                                        : null,
                               ),
                               child: TextField(
                                 controller: _usernameController,
@@ -132,11 +137,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: InputDecoration(
                                   hintText: 'اسم المستخدم',
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 16,
+                                  ),
                                 ),
                               ),
                             ),
-                            
+
                             // Username error message
                             if (_usernameError != null)
                               Container(
@@ -151,17 +159,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
-                            
+
                             SizedBox(height: 15),
-                            
+
                             // Password TextField
                             Container(
                               decoration: BoxDecoration(
                                 color: Color(0xFFEEEEEE),
                                 borderRadius: BorderRadius.circular(8),
-                                border: _passwordError != null 
-                                    ? Border.all(color: Colors.red, width: 1.0)
-                                    : null,
+                                border:
+                                    _passwordError != null
+                                        ? Border.all(
+                                          color: Colors.red,
+                                          width: 1.0,
+                                        )
+                                        : null,
                               ),
                               child: TextField(
                                 controller: _passwordController,
@@ -178,22 +190,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: InputDecoration(
                                   hintText: 'كلمة المرور',
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 16,
+                                  ),
                                   prefixIcon: IconButton(
                                     icon: Icon(
-                                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                      _isPasswordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
                                       color: Colors.grey,
                                     ),
                                     onPressed: () {
                                       setState(() {
-                                        _isPasswordVisible = !_isPasswordVisible;
+                                        _isPasswordVisible =
+                                            !_isPasswordVisible;
                                       });
                                     },
                                   ),
                                 ),
                               ),
                             ),
-                            
+
                             // Password error message
                             if (_passwordError != null)
                               Container(
@@ -208,9 +226,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
-                              
+
                             SizedBox(height: 25),
-                            
+
                             // Login Button
                             Container(
                               width: double.infinity,
@@ -233,11 +251,17 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             SizedBox(height: 15),
-                            
+
                             // Forgot Password Text
                             TextButton(
                               onPressed: () {
-                                // Handle forgot password
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => ForgotPasswordScreen(),
+                                  ),
+                                );
                               },
                               child: Text(
                                 'هل نسيت كلمة المرور ؟',
@@ -247,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             // Register New Account Text
                             TextButton(
                               onPressed: () {
@@ -283,33 +307,33 @@ class _LoginScreenState extends State<LoginScreen> {
       _usernameError = null;
       _passwordError = null;
     });
-    
+
     // Validate fields
     bool hasError = false;
-    
+
     if (_usernameController.text.isEmpty) {
       setState(() {
         _usernameError = 'يرجى إدخال اسم المستخدم';
       });
       hasError = true;
     }
-    
+
     if (_passwordController.text.isEmpty) {
       setState(() {
         _passwordError = 'يرجى إدخال كلمة المرور';
       });
       hasError = true;
     }
-    
+
     if (hasError) {
       return;
     }
-    
+
     // Proceed with login
     print('Logging in with:');
     print('Username: ${_usernameController.text}');
     print('Password: ${_passwordController.text}');
-    
+
     // Here you would implement actual authentication logic
     // For example:
     // authService.login(_usernameController.text, _passwordController.text)

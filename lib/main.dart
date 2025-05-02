@@ -1,5 +1,7 @@
+import 'package:dalil/screens/ResetPasswordScreen.dart';
+import 'package:dalil/screens/VerificationCodeScreen.dart';
 import 'package:flutter/material.dart';
-import 'screens/login_screen.dart';
+import 'screens/VerificationCodeScreen.dart';
 import 'core/app_theme.dart';
 
 void main() {
@@ -12,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Dalil Metro',
       theme: AppTheme.lightTheme,
-      home: LoginScreen(),
+      home: VerificationCodeScreen(email: '',),
       debugShowCheckedModeBanner: false,
     );
   }
