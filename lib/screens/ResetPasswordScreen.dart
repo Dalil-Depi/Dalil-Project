@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../core/app_colors.dart';
-import 'login_screen.dart';  // Import your login screen
+import 'login_screen.dart';  
 
 class ResetPasswordScreen extends StatefulWidget {
   final String email;
@@ -237,17 +237,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       return;
     }
     
-    // Here you would implement your actual password reset logic
-    // For example:
-    // authService.resetPassword(widget.email, _passwordController.text)
-    //   .then((success) {
-    //     if (success) {
-    //       // Show success message and navigate back to login
-    //       showSuccessDialog();
-    //     } else {
-    //       // Handle error
-    //     }
-    //   });
+    // Here you would implement  actual password reset logic
     
     // For demo, show success dialog
     print('Resetting password for: ${widget.email}');
