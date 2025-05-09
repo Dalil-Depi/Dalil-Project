@@ -154,32 +154,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     print('Sending password reset email to: ${_emailController.text}');
     
     // Here you would implement your actual password reset logic
-    // For example:
-    // authService.sendPasswordResetEmail(_emailController.text)
-    //   .then((success) {
-    //     if (success) {
-    //       showDialog(
-    //         context: context,
-    //         builder: (context) => AlertDialog(
-    //           title: Text('تم إرسال رابط إعادة تعيين كلمة المرور'),
-    //           content: Text('يرجى التحقق من بريدك الإلكتروني'),
-    //           actions: [
-    //             TextButton(
-    //               onPressed: () {
-    //                 Navigator.pop(context);
-    //                 Navigator.pop(context); // Return to login screen
-    //               },
-    //               child: Text('حسناً'),
-    //             )
-    //           ],
-    //         ),
-    //       );
-    //     } else {
-    //       setState(() {
-    //         _emailError = 'لم يتم العثور على حساب بهذا البريد الإلكتروني';
-    //       });
-    //     }
-    //   });
+    
     
     // For demo, show a success dialog
     showDialog(

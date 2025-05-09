@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../core/app_colors.dart';
-import 'forgot_password_screen.dart';  // Import the separate reset password screen
+import 'forgot_password_screen.dart';  
 
 class VerificationCodeScreen extends StatefulWidget {
   final String email;
@@ -55,7 +55,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Color(0xFFEEEEEE), // Light gray background
+        color: Color(0xFFEEEEEE), 
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -194,15 +194,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     print('Resending verification code to: ${widget.email}');
     
     // Here you would implement your actual code resend logic
-    // For example:
-    // authService.resendVerificationCode(widget.email)
-    //   .then((success) {
-    //     if (success) {
-    //       _startResendCountdown();
-    //     } else {
-    //       // Handle error
-    //     }
-    //   });
+  
     
     // For demo, just start the countdown
     _startResendCountdown();
@@ -238,20 +230,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     }
     
     // Here you would implement your actual code verification logic
-    // For example:
-    // authService.verifyCode(widget.email, _codeController.text)
-    //   .then((success) {
-    //     if (success) {
-    //       Navigator.pushReplacement(
-    //         context, 
-    //         MaterialPageRoute(builder: (context) => ResetPasswordScreen(email: widget.email)),
-    //       );
-    //     } else {
-    //       setState(() {
-    //         _codeError = 'الكود غير صحيح. يرجى المحاولة مرة أخرى';
-    //       });
-    //     }
-    //   });
+    
     
     // For demo, navigate to reset password screen
     print('Verifying code: ${_codeController.text}');

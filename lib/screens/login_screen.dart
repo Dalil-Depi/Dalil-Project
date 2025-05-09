@@ -22,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Column(
         children: [
-          // Top Navy Section with Logo (reduced height)
+          
           Container(
             height: MediaQuery.of(context).size.height * 0.28,
             color: AppColors.primary,
@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: 20),
                       // Logo image
                       Image.asset(
-                        'assets/logo_light.png', // Make sure this path exists
+                        'assets/logo_light.png', 
                         width: 100,
                         height: 80,
                       ),
@@ -296,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ],
       ),
-      // Using your custom bottom navigation bar
+      // Using custom bottom navigation bar
       bottomNavigationBar: CustomBottomNavBar(),
     );
   }
@@ -335,16 +335,6 @@ class _LoginScreenState extends State<LoginScreen> {
     print('Password: ${_passwordController.text}');
 
     // Here you would implement actual authentication logic
-    // For example:
-    // authService.login(_usernameController.text, _passwordController.text)
-    //   .then((success) {
-    //     if (success) {
-    //       // Navigate to home
-    //     } else {
-    //       setState(() {
-    //         _passwordError = 'اسم المستخدم أو كلمة المرور غير صحيحة';
-    //       });
-    //     }
-    //   });
+    
   }
 }
