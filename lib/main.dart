@@ -1,10 +1,15 @@
-import 'package:dalil/screens/ResetPasswordScreen.dart';
-import 'package:dalil/screens/VerificationCodeScreen.dart';
+import 'package:dalil/screens/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'screens/VerificationCodeScreen.dart';
 import 'core/app_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  // Ensure that plugin services are initialized so that Firebase can be used
+   WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -14,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Dalil Metro',
       theme: AppTheme.lightTheme,
-      home: VerificationCodeScreen(email: '',),
+      home: LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

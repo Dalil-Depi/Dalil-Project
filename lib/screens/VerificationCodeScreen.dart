@@ -1,8 +1,9 @@
+import 'package:dalil/screens/ResetPasswordScreen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../core/app_colors.dart';
-import 'forgot_password_screen.dart';  
+  
 
 class VerificationCodeScreen extends StatefulWidget {
   final String email;
@@ -239,7 +240,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ForgotPasswordScreen(),
+        builder: (context) => ResetPasswordScreen(email:'')
       ),
     );
   }

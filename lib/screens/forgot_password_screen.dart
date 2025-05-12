@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../core/app_colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
   String? _emailError;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -97,25 +99,34 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     
                     // Confirm Button
                     Container(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _sendResetLink,
-                        child: Text(
-                          'تـأكـيـد',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
+                               width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: _isLoading ? null : _sendResetLink,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: _isLoading
+                                      ? const SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Text(
+                                          'تـأكـيـد',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                ),
+                                ) ,
                   ],
                 ),
               ),
@@ -128,50 +139,79 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  void _sendResetLink() {
+ 
+Future<void> _sendResetLink() async {
+  final email = _emailController.text.trim();
+  
+
+  setState(() {
+    _emailError = null;
+  });
+
+  // Validate input
+  if (email.isEmpty) {
     setState(() {
-      _emailError = null;
+      _emailError = 'يرجى إدخال البريد الإلكتروني';
     });
-    
-    // Validate email
-    if (_emailController.text.isEmpty) {
-      setState(() {
-        _emailError = 'يرجى إدخال البريد الإلكتروني';
-      });
-      return;
-    }
-    
-    // Basic email validation
-    bool emailValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(_emailController.text);
-    if (!emailValid) {
-      setState(() {
-        _emailError = 'يرجى إدخال بريد إلكتروني صحيح';
-      });
-      return;
-    }
-    
-    // If valid, proceed with password reset process
-    print('Sending password reset email to: ${_emailController.text}');
-    
-    // Here you would implement your actual password reset logic
-    
-    
-    // For demo, show a success dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('تم إرسال رابط إعادة تعيين كلمة المرور'),
-        content: Text('يرجى التحقق من بريدك الإلكتروني'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context); // Return to login screen
-            },
-            child: Text('حسناً'),
-          )
-        ],
-      ),
-    );
+    return;
   }
+
+  final emailValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  if (!emailValid) {
+    setState(() {
+      _emailError = 'يرجى إدخال بريد إلكتروني صحيح';
+    });
+    return;
+  }
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم إرسال رابط إعادة تعيين كلمة المرور إذا كان البريد الإلكتروني مسجلاً.'),
+        ),
+      );
+      Navigator.pop(context); // Return to previous screen (e.g., login)
+    }
+  } on FirebaseAuthException catch (e) {
+    String errorMessage;
+    switch (e.code) {
+      case 'invalid-email':
+        errorMessage = 'البريد الإلكتروني غير صالح.';
+        break;
+      default:
+        errorMessage = 'حدث خطأ أثناء الإرسال. حاول مرة أخرى.';
+    }
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    }
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('حدث خطأ غير متوقع. حاول مرة أخرى.')),
+      );
+    }
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
+@override
+void dispose() {
+  _emailController.dispose();
+  super.dispose();
+}
+
+
+
 }

@@ -1,6 +1,26 @@
+import 'package:dalil/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+// Validation functions
+bool isValidPhone(String phone) {
+  final regex = RegExp(r'^01[0-9]{9}$');
+  return regex.hasMatch(phone);
+}
+
+bool isValidPassword(String password) {
+  final regex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
+  return regex.hasMatch(password);
+}
+
+bool isValidEmail(String email) {
+  final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+  return regex.hasMatch(email);
+}
+
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -106,19 +126,18 @@ class _SignupScreenState extends State<SignupScreen> {
                         
                         // Phone Number
                         _buildTextField(
-                          controller: _phoneController,
-                          hint: 'رقم الهاتف الحمول *',
-                          prefixText: '+20',
-                          errorText: _phoneError,
-                          onChanged: (value) {
-                            setState(() {
-                              _phoneError = value.isEmpty 
-                                ? 'برجاء إدخال رقم الهاتف' 
-                                : null;
-                            });
-                          }
-                        ),
-                        
+                                          controller: _phoneController,
+                                          hint: 'رقم الهاتف المحمول *',
+                                          prefixText: '+20',
+                                          errorText: _phoneError,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _phoneError = isValidPhone(value)
+                                                  ? null
+                                                  : 'رقم الهاتف يجب أن يكون 11 رقما ويبدأ بـ 01';
+                                            });
+                                          },
+                                        ),
                         SizedBox(height: 15),
                         
                         // Username
@@ -138,59 +157,60 @@ class _SignupScreenState extends State<SignupScreen> {
                         SizedBox(height: 15),
                         
                         // Password
-                        _buildTextField(
-                          controller: _passwordController,
-                          hint: 'كلمة السر *',
-                          obscureText: true,
-                          errorText: _passwordError,
-                          onChanged: (value) {
-                            setState(() {
-                              _passwordError = value.isEmpty 
-                                ? 'برجاء إدخال كلمة المرور' 
-                                : null;
-                            });
-                          }
-                        ),
+                       _buildTextField(
+                                         controller: _passwordController,
+                                         hint: 'كلمة السر *',
+                                        obscureText: true,
+                                        errorText: _passwordError,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _passwordError = isValidPassword(value)
+                                                ? null
+                                                : 'كلمة المرور يجب أن تحتوي على حرف كبير، صغير، رقم، ورمز (!@#...) ولا تقل عن 8 أحرف';
+                                          });
+                                        },
+                                      ),
                         
                         SizedBox(height: 15),
                         
                         // Email
-                        _buildTextField(
-                          controller: _emailController,
-                          hint: 'البريد الإلكتروني *',
-                          errorText: _emailError,
-                          onChanged: (value) {
-                            setState(() {
-                              _emailError = value.isEmpty 
-                                ? 'برجاء إدخال البريد الإلكتروني' 
-                                : null;
-                            });
-                          }
-                        ),
+                       _buildTextField(
+                                        controller: _emailController,
+                                        hint: 'البريد الإلكتروني *',
+                                        errorText: _emailError,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _emailError = isValidEmail(value)
+                                                ? null
+                                                : 'البريد الإلكتروني غير صالح';
+                                          });
+                                        },
+                                      ),
+
                         
                         SizedBox(height: 30),
                         
                         // Create Account Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: _handleSignup,
-                            child: Text(
-                              'انشاء حساب',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
+                   SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: _isSigningUp ? null : _handleSignup,
+                                child: _isSigningUp
+                                    ? CircularProgressIndicator(color: Colors.white)
+                                    : Text(
+                                        'انشاء حساب',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                                      ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
                               ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
+                            )
+,
                       ],
                     ),
                   ),
@@ -255,46 +275,93 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         errorText: errorText,
-        errorStyle: TextStyle(
-          color: Colors.red,
-          fontSize: 12,
-        ),
-      ),
+errorMaxLines: 3, // Allow up to 3 lines for wrapping
+errorStyle: TextStyle(
+  color: Colors.red,
+  fontSize: 12,
+  height: 1.2,
+  overflow: TextOverflow.visible,
+),
+
+    ),
     );
   }
   
-  void _handleSignup() {
-    setState(() {
-      _firstNameError = _firstNameController.text.isEmpty 
-        ? 'برجاء إدخال الاسم الأول' 
-        : null;
-      _lastNameError = _lastNameController.text.isEmpty 
-        ? 'برجاء إدخال اسم العائلة' 
-        : null;
-      _phoneError = _phoneController.text.isEmpty 
-        ? 'برجاء إدخال رقم الهاتف' 
-        : null;
-      _usernameError = _usernameController.text.isEmpty 
-        ? 'برجاء إدخال اسم المستخدم' 
-        : null;
-      _passwordError = _passwordController.text.isEmpty 
-        ? 'برجاء إدخال كلمة المرور' 
-        : null;
-      _emailError = _emailController.text.isEmpty 
-        ? 'برجاء إدخال البريد الإلكتروني' 
-        : null;
+
+bool _isSigningUp = false; // Add this at the class level
+
+Future<void> _handleSignup() async {
+  setState(() => _isSigningUp = true);
+
+  // Re-validate fields as fallback
+  setState(() {
+    _firstNameError = _firstNameController.text.isEmpty ? 'برجاء إدخال الاسم الأول' : null;
+    _lastNameError = _lastNameController.text.isEmpty ? 'برجاء إدخال اسم العائلة' : null;
+    _phoneError = isValidPhone(_phoneController.text) ? null : 'رقم الهاتف يجب أن يكون 11 رقما ويبدأ بـ 01';
+   _usernameError = _usernameController.text.isEmpty ? 'برجاء إدخال اسم المستخدم' : null;
+    _passwordError = isValidPassword(_passwordController.text) ? null : 'كلمة المرور يجب أن تحتوي على حرف كبير، صغير، رقم، ورمز (!@#...) ولا تقل عن 8 أحرف';
+    _emailError = isValidEmail(_emailController.text) ? null : 'البريد الإلكتروني غير صالح';
+ });
+
+  if ([_firstNameError, _lastNameError, _phoneError, _usernameError, _passwordError, _emailError].any((e) => e != null)) {
+    setState(() => _isSigningUp = false);
+    return;
+  }
+
+  // Show loading spinner
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => Center(child: CircularProgressIndicator()),
+  );
+
+  try {
+    final auth = FirebaseAuth.instance;
+    final userCredential = await auth.createUserWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    final userId = userCredential.user!.uid;
+
+    await FirebaseFirestore.instance.collection('users').doc(userId).set({
+      'firstName': _firstNameController.text.trim(),
+      'lastName': _lastNameController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'username': _usernameController.text.trim(),
+      'email': _emailController.text.trim(),
+      'createdAt': Timestamp.now(),
     });
 
-    if (_firstNameError == null && 
-        _lastNameError == null && 
-        _phoneError == null && 
-        _usernameError == null && 
-        _passwordError == null && 
-        _emailError == null) {
-      // Proceed with signup
-      print('All fields are valid');
-    }
+    // Dismiss spinner
+    Navigator.of(context).pop();
+
+    // Show success
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('تم إنشاء الحساب بنجاح!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // Navigate to login after short delay
+    await Future.delayed(Duration(seconds: 1));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => LoginScreen()));
+  } on FirebaseAuthException catch (e) {
+    Navigator.of(context).pop(); // Dismiss spinner
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('فشل في التسجيل: '),
+        backgroundColor: Colors.red,
+      ),
+    );
+  } finally {
+    setState(() => _isSigningUp = false);
   }
+}
+
+
+
 
   @override
   void dispose() {

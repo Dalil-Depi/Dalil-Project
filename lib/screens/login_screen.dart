@@ -1,7 +1,9 @@
+import 'package:dalil/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../core/app_colors.dart';
 import '../screens/forgot_password_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -101,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             // Subtitle
                             Text(
-                              'أدخل اسم المستخدم أو البريد الإلكتروني وكلمة السر',
+                              'ادخل البريد الإلكتروني وكلمة السر',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[700],
@@ -135,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   }
                                 },
                                 decoration: InputDecoration(
-                                  hintText: 'اسم المستخدم',
+                                  hintText: 'البريد الإلكتروني',
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -230,26 +232,35 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(height: 25),
 
                             // Login Button
-                            Container(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: _performLogin,
-                                child: Text(
-                                  'تسجيل الدخول',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            Container( 
+                                        width: double.infinity,
+                                          height: 50,
+                                          child: ElevatedButton(
+                                            onPressed: _isLoading ? null : _performLogin,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: AppColors.primary,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            child: _isLoading
+                                                ? const SizedBox(
+                                                    width: 24,
+                                                    height: 24,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                                    ),
+                                                  )
+                                                : const Text(
+                                                    'تسجيل الدخول',
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                          ),
+                                      ),
                             SizedBox(height: 15),
 
                             // Forgot Password Text
@@ -275,7 +286,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             // Register New Account Text
                             TextButton(
                               onPressed: () {
-                                // Handle registration
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => SignupScreen(),
+                                  ),
+                                );
                               },
                               child: Text(
                                 'تسجيل حساب جديد',
@@ -301,40 +318,124 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _performLogin() {
-    // Reset previous errors
+bool _isLoading = false;
+
+Future<void> _performLogin() async {
+  final email = _usernameController.text.trim();
+  final password = _passwordController.text;
+
+  setState(() {
+    _usernameError = null;
+    _passwordError = null;
+    _isLoading = true;
+  });
+
+  bool hasError = false;
+
+  if (email.isEmpty) {
     setState(() {
-      _usernameError = null;
-      _passwordError = null;
+      _usernameError = 'يرجى إدخال البريد الإلكتروني';
+    });
+    hasError = true;
+  }
+
+  if (password.isEmpty) {
+    setState(() {
+      _passwordError = 'يرجى إدخال كلمة المرور';
+    });
+    hasError = true;
+  }
+
+  if (hasError) {
+    setState(() {
+      _isLoading = false;
+    });
+    return;
+  }
+
+  try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    // Clear input fields
+    _usernameController.clear();
+    _passwordController.clear();
+
+    setState(() {
+      _isLoading = false;
     });
 
-    // Validate fields
-    bool hasError = false;
+    // Show login success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('تم تسجيل الدخول بنجاح')),
+    );
 
-    if (_usernameController.text.isEmpty) {
-      setState(() {
-        _usernameError = 'يرجى إدخال اسم المستخدم';
-      });
-      hasError = true;
+    // Navigate to the home screen (uncomment for production)
+    // Navigator.pushReplacementNamed(context, '/home');
+
+  } on FirebaseAuthException catch (e) {
+    setState(() {
+      _isLoading = false;
+    });
+
+    switch (e.code) {
+      case 'invalid-credential':
+        _showErrorDialog(
+          context,
+          title: 'خطأ في تسجيل الدخول',
+          message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.',
+        );
+        break;
+      case 'invalid-email':
+        setState(() {
+          _usernameError = 'البريد الإلكتروني غير صالح.';
+        });
+        break;
+      default:
+        _showErrorDialog(
+          context,
+          title: 'حدث خطأ',
+          message: e.message ?? 'حدث خطأ غير متوقع أثناء تسجيل الدخول.',
+        );
+        break;
     }
-
-    if (_passwordController.text.isEmpty) {
-      setState(() {
-        _passwordError = 'يرجى إدخال كلمة المرور';
-      });
-      hasError = true;
-    }
-
-    if (hasError) {
-      return;
-    }
-
-    // Proceed with login
-    print('Logging in with:');
-    print('Username: ${_usernameController.text}');
-    print('Password: ${_passwordController.text}');
-
-    // Here you would implement actual authentication logic
-    
+  } catch (_) {
+    setState(() {
+      _isLoading = false;
+    });
+    _showErrorDialog(
+      context,
+      title: 'خطأ غير متوقع',
+      message: 'حدث خطأ أثناء تسجيل الدخول. حاول مرة أخرى لاحقًا.',
+    );
   }
+}
+
+void _showErrorDialog(BuildContext context, {
+  required String title,
+  required String message,
+}) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title, textAlign: TextAlign.right),
+      content: Text(message, textAlign: TextAlign.right),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('حسناً'),
+        ),
+      ],
+    ),
+  );
+}
+
+@override
+void dispose() {
+  _usernameController.dispose();
+  _passwordController.dispose();
+  super.dispose();
+}
 }
