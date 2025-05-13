@@ -1,0 +1,16 @@
+{
+    "@@locale": "ar",
+    "goodMorning": "صباح الخير",
+    "wishYouSafety": "نتمنى لكم السلامة",
+    "remainingBalance": "الرصيد المتبقي: {amount} جنيه",
+    "charge": "اشحن",
+    "bookTicketNow": "!احجز تذكرتك دلوقتي",
+    "selectStations": "اختر المحطات واعرف تفاصيل رحلتك وأسعار التذاكر",
+    "selectDeparture": "اختر محطة القيام",
+    "selectArrival": "اختر محطة الوصول",
+    "bookTicket": "احجز تذكرة",
+    "tripDetails": "تفاصيل الرحلة",
+    "metroLines": "خطوط المترو",
+    "myTickets": "تذكرتي",
+    "more": "المزيد"
+  }

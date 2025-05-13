@@ -1,0 +1,16 @@
+{
+    "@@locale": "en",
+    "goodMorning": "Good Morning",
+    "wishYouSafety": "Wish you safety",
+    "remainingBalance": "Remaining balance: {amount} EGP",
+    "charge": "Charge",
+    "bookTicketNow": "Book your ticket now!",
+    "selectStations": "Select stations and know your trip details and ticket prices",
+    "selectDeparture": "Select departure station",
+    "selectArrival": "Select arrival station",
+    "bookTicket": "Book Ticket",
+    "tripDetails": "Trip Details",
+    "metroLines": "Metro Lines",
+    "myTickets": "My Tickets",
+    "more": "More"
+  }
